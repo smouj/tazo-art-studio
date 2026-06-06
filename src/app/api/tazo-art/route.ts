@@ -27,7 +27,157 @@ export async function GET() {
   }
 }
 
-// POST - Generate and save a new tazo art
+// ────────────────────────────────────────────────────────────
+// STRICT PROMPT BUILDERS — No backgrounds, no scenery, no text
+// ────────────────────────────────────────────────────────────
+
+/** Visual style per collection — character design aesthetic only, no environment */
+const COLLECTION_STYLES: Record<string, string> = {
+  minimon:
+    '90s anime collectible creature style, expressive cute monster design, bold clean outlines, cel shading, toy-like proportions, readable silhouette, vibrant character colors',
+  dracobell:
+    'retro martial arts anime fighter style, dynamic combat pose, energy aura attached to the body, bold cel shading, expressive action silhouette, dramatic character lighting',
+  cybermon:
+    'retro digital monster anime style, cybernetic creature design, glowing circuit accents on the body, angular silhouette, metallic plates on the character, electric energy attached to the body',
+};
+
+/** Rarity visual effects — must be attached to the character, NEVER a background */
+const RARITY_VISUAL: Record<string, string> = {
+  common:
+    'simple clean character design, minimal body details, straightforward pose',
+  uncommon:
+    'subtle glow effect attached to the character silhouette only, slight shimmer on the body',
+  rare:
+    'blue energy highlights attached to the body, crystalline accents on the character, dynamic pose',
+  'ultra-rare':
+    'purple aura around the character body, metallic highlights on the character, powerful stance, dramatic lighting on the figure',
+  legendary:
+    'golden aura attached to the character, crown-like light effect above the head, magnificent character presence, godlike radiance from the body',
+};
+
+/** Role visual cues — character pose and energy, no background */
+const ROLE_VISUAL: Record<string, string> = {
+  attacker: 'aggressive fighting stance, power focus, energy fists, forward-leaning pose',
+  tank: 'massive defensive posture, shield stance, armored body, grounded wide stance',
+  technical: 'analytical pose, holographic interface lines near the hands, precision focus',
+  bouncer: 'acrobatic position, spring-like coiled energy, mid-air jumping pose',
+  heavy: 'ground-shaking stance, massive frame, gravity ripple effect beneath the feet',
+  light: 'swift nimble pose, speed lines trailing the body, ethereal floating stance',
+  balanced: 'centered meditative stance, equilibrium pose, harmonious energy around the hands',
+  special: 'mysterious enigmatic aura attached to the body, otherworldly character presence, unique form',
+};
+
+/** Mandatory transparency guard — appended to EVERY prompt */
+const TRANSPARENCY_GUARD = `
+Mandatory output requirements:
+- Real transparent alpha background — absolutely no background visible.
+- Character only — isolated figure with no environment.
+- No scenery, no landscape, no room, no sky, no ground.
+- No circular frame, no tazo border, no card edge.
+- No text, no letters, no numbers, no watermark, no logo.
+- No white background, no black background, no gradient background.
+- No background pattern, no stars background, no galaxy background.
+- No dirty cutout edges — clean character silhouette.
+- Soft transparent contact shadow beneath the feet only — no ground plane.
+`;
+
+/** Negative prompt — what must NEVER appear in the output */
+const NEGATIVE_PROMPT =
+  'background, scenery, landscape, room, sky, stars background, galaxy background, gradient background, white background, black background, circular frame, coin frame, card border, text, letters, watermark, logo, UI, stats, number, nameplate, dirty cutout, square image background, environmental background, scene, platform, floor, ground, pedestal';
+
+/** Build the final prompt with transparency guard always applied */
+function buildFinalPrompt(
+  name: string,
+  description: string,
+  collection: string,
+  rarity: string,
+  role: string,
+  customPrompt?: string
+): string {
+  const baseStyle = COLLECTION_STYLES[collection] || COLLECTION_STYLES.minimon;
+  const rarityStyle = RARITY_VISUAL[rarity] || RARITY_VISUAL.common;
+  const roleStyle = ROLE_VISUAL[role] || ROLE_VISUAL.balanced;
+
+  if (customPrompt && customPrompt.trim().length > 0) {
+    // Even with custom prompts, always append the transparency guard
+    return `${customPrompt.trim()}\n\n${TRANSPARENCY_GUARD}`;
+  }
+
+  return `Transparent PNG character illustration for a collectible tazo disc: ${name}, ${description}.
+${baseStyle}. ${rarityStyle}. ${roleStyle}.
+Full body character only, centered composition, real alpha transparent background.
+Clean silhouette, bold 90s anime outlines, cel shading, soft transparent contact shadow.
+Designed to be composited over a separate tazo frontal background.
+${TRANSPARENCY_GUARD}`;
+}
+
+// ──────────────────────────────────────────────
+// TRANSPARENCY VALIDATION
+// ──────────────────────────────────────────────
+
+interface TransparencyCheck {
+  hasAlpha: boolean;
+  cornersTransparent: boolean;
+  warning?: string;
+}
+
+async function checkTransparency(buffer: Buffer): Promise<TransparencyCheck> {
+  try {
+    const sharp = (await import('sharp')).default;
+    const metadata = await sharp(buffer).metadata();
+    const hasAlpha = metadata.hasAlpha === true;
+
+    if (!hasAlpha) {
+      return { hasAlpha: false, cornersTransparent: false, warning: 'Image has no alpha channel — background is not transparent.' };
+    }
+
+    // Check the 4 corners for transparency
+    const { data, info } = await sharp(buffer)
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+
+    const { width, height, channels } = info;
+    // Sample a 5x5 area in each corner
+    const sampleSize = 5;
+    const corners = [
+      { x: 0, y: 0 },
+      { x: width - sampleSize, y: 0 },
+      { x: 0, y: height - sampleSize },
+      { x: width - sampleSize, y: height - sampleSize },
+    ];
+
+    let allTransparent = true;
+    for (const corner of corners) {
+      for (let dy = 0; dy < sampleSize && allTransparent; dy++) {
+        for (let dx = 0; dx < sampleSize && allTransparent; dx++) {
+          const idx = ((corner.y + dy) * width + (corner.x + dx)) * channels;
+          const alpha = data[idx + 3]; // Alpha is the 4th channel
+          if (alpha > 10) {
+            // More than 10/255 alpha — not transparent
+            allTransparent = false;
+          }
+        }
+      }
+      if (!allTransparent) break;
+    }
+
+    return {
+      hasAlpha: true,
+      cornersTransparent: allTransparent,
+      warning: allTransparent
+        ? undefined
+        : 'Generated image may not have a real transparent background. Corners are not transparent — the AI may have added a background.',
+    };
+  } catch {
+    return { hasAlpha: false, cornersTransparent: false, warning: 'Could not verify transparency.' };
+  }
+}
+
+// ──────────────────────────────────────────────
+// POST — Generate and save a new tazo art
+// ──────────────────────────────────────────────
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -48,39 +198,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Build the AI image generation prompt
-    const collectionStyles: Record<string, string> = {
-      minimon: 'Pokemon-style creature, cute monster, vibrant anime style, yellow and orange tones, cartoon creature design',
-      dracobell: 'Dragon Ball Z style warrior, powerful martial artist, spiky hair, orange and red energy aura, anime fighter',
-      cybermon: 'Digimon-style digital monster, cybernetic creature, blue and cyan digital patterns, techno-organic being',
-    };
-
-    const rarityVisual: Record<string, string> = {
-      common: 'simple clean design, minimal effects',
-      uncommon: 'subtle glow effect, slight shimmer',
-      rare: 'blue energy aura, crystalline highlights, dynamic pose',
-      'ultra-rare': 'purple cosmic energy, starfield background, powerful stance, dramatic lighting',
-      legendary: 'golden divine glow, crown of light, legendary aura, celestial background, magnificent, godlike presence, holy radiance',
-    };
-
-    const roleVisual: Record<string, string> = {
-      attacker: 'aggressive fighting stance, power focus, energy fists',
-      tank: 'massive defensive posture, shield stance, armored body',
-      technical: 'analytical pose, holographic interface elements, precision',
-      bouncer: 'acrobatic position, spring-like coiled energy, bouncing',
-      heavy: 'ground-shaking stance, massive frame, gravity effect',
-      light: 'swift nimble pose, speed lines, ethereal',
-      balanced: 'centered meditative stance, equilibrium, harmony',
-      special: 'mysterious enigmatic aura, otherworldly, unique form',
-    };
-
-    const baseStyle = collectionStyles[collection] || collectionStyles.minimon;
-    const rarityStyle = rarityVisual[rarity] || rarityVisual.common;
-    const roleStyle = roleVisual[role] || roleVisual.balanced;
-
-    const prompt = customPrompt
-      ? customPrompt
-      : `Character illustration for collectible tazo disc: ${name}, ${description}. ${baseStyle}. ${rarityStyle}. ${roleStyle}. Character centered on transparent background, full body character art, bold outlines, high contrast, detailed anime illustration style, official collectible card art, high quality, detailed, character design`;
+    // Build the strict transparency-safe prompt
+    const prompt = buildFinalPrompt(name, description, collection, rarity, role, customPrompt);
 
     // Generate image using z-ai-web-dev-sdk
     const ZAI = (await import('z-ai-web-dev-sdk')).default;
@@ -88,17 +207,22 @@ export async function POST(request: NextRequest) {
 
     const response = await zai.images.generations.create({
       prompt: prompt,
+      negative_prompt: NEGATIVE_PROMPT,
       size: '1024x1024',
     });
 
     const characterBase64 = response.data[0].base64;
+    const characterBuffer = Buffer.from(characterBase64, 'base64');
+
+    // Validate transparency
+    const transparencyCheck = await checkTransparency(characterBuffer);
 
     // Select a random frontal background for this collection
     const bgFiles = FRONTAL_BG_FILES[collection] || FRONTAL_BG_FILES.minimon;
-    // For legendary/ultra-rare, allow special backgrounds too
-    const availableBgs = (rarity === 'legendary' || rarity === 'ultra-rare')
-      ? [...bgFiles, ...FRONTAL_BG_FILES.special]
-      : bgFiles;
+    const availableBgs =
+      rarity === 'legendary' || rarity === 'ultra-rare'
+        ? [...bgFiles, ...FRONTAL_BG_FILES.special]
+        : bgFiles;
     const selectedBg = availableBgs[Math.floor(Math.random() * availableBgs.length)];
 
     // Composite character onto frontal background using sharp
@@ -106,9 +230,14 @@ export async function POST(request: NextRequest) {
     try {
       const sharp = (await import('sharp')).default;
 
-      // Load the frontal background
-      const bgPath = path.join(process.cwd(), 'public', 'tazo-assets', 'frontal', collection, selectedBg);
-      // Fallback to special if the collection-specific one doesn't exist
+      const bgPath = path.join(
+        process.cwd(),
+        'public',
+        'tazo-assets',
+        'frontal',
+        collection,
+        selectedBg
+      );
       const actualBgPath = fs.existsSync(bgPath)
         ? bgPath
         : path.join(process.cwd(), 'public', 'tazo-assets', 'frontal', 'special', selectedBg);
@@ -118,30 +247,31 @@ export async function POST(request: NextRequest) {
         const bgImage = sharp(bgBuffer);
         const bgMetadata = await bgImage.metadata();
 
-        // Resize character to fit inside the background (about 65% of bg size, centered)
         const bgSize = bgMetadata.width || 1254;
         const charSize = Math.round(bgSize * 0.65);
         const offset = Math.round((bgSize - charSize) / 2);
 
-        const characterBuffer = Buffer.from(characterBase64, 'base64');
         const resizedCharacter = await sharp(characterBuffer)
-          .resize(charSize, charSize, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+          .resize(charSize, charSize, {
+            fit: 'contain',
+            background: { r: 0, g: 0, b: 0, alpha: 0 },
+          })
           .png()
           .toBuffer();
 
-        // Composite: character on top of background
         const compositedBuffer = await bgImage
-          .composite([{
-            input: resizedCharacter,
-            left: offset,
-            top: offset,
-          }])
+          .composite([
+            {
+              input: resizedCharacter,
+              left: offset,
+              top: offset,
+            },
+          ])
           .png()
           .toBuffer();
 
         compositedBase64 = compositedBuffer.toString('base64');
       } else {
-        // No background found, use character as-is
         compositedBase64 = characterBase64;
       }
     } catch (compositeError) {
@@ -163,7 +293,6 @@ export async function POST(request: NextRequest) {
 
     const baseStats = roleStats[role] || roleStats.balanced;
 
-    // Apply rarity modifier
     const rarityMultiplier: Record<string, number> = {
       common: 0.8,
       uncommon: 0.9,
@@ -203,11 +332,25 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true, data: tazoArt });
+    return NextResponse.json({
+      success: true,
+      data: tazoArt,
+      transparency: transparencyCheck.hasAlpha
+        ? transparencyCheck.cornersTransparent
+          ? 'ok'
+          : 'warning'
+        : 'error',
+      transparencyDetails: transparencyCheck,
+    });
   } catch (error) {
     console.error('Error generating tazo art:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to generate tazo art: ' + (error instanceof Error ? error.message : 'Unknown error') },
+      {
+        success: false,
+        error:
+          'Failed to generate tazo art: ' +
+          (error instanceof Error ? error.message : 'Unknown error'),
+      },
       { status: 500 }
     );
   }

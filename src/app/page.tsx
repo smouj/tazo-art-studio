@@ -134,6 +134,7 @@ export default function Home() {
   // Detail modal
   const [selectedTazo, setSelectedTazo] = useState<TazoArt | null>(null);
   const [showBack, setShowBack] = useState(false);
+  const [showCreatureOnly, setShowCreatureOnly] = useState(false);
 
   // Gallery filter
   const [galleryFilter, setGalleryFilter] = useState<string>('all');
@@ -242,16 +243,49 @@ export default function Home() {
   };
 
   // Download tazo image
-  const handleDownload = (tazo: TazoArt, side: 'front' | 'back') => {
+  const handleDownload = (tazo: TazoArt, side: 'front' | 'back' | 'creature') => {
     const link = document.createElement('a');
     if (side === 'front') {
       link.href = `data:image/png;base64,${tazo.imageData}`;
       link.download = `tazo-${tazo.collection}-${tazo.name.toLowerCase().replace(/\s+/g, '-')}-front.png`;
+    } else if (side === 'creature') {
+      link.href = `data:image/png;base64,${tazo.characterData}`;
+      link.download = `tazo-${tazo.collection}-${tazo.name.toLowerCase().replace(/\s+/g, '-')}-creature.png`;
     } else {
       link.href = `/tazo-assets/back/back-${tazo.collection}.png`;
       link.download = `tazo-${tazo.collection}-${tazo.name.toLowerCase().replace(/\s+/g, '-')}-back.png`;
     }
     link.click();
+  };
+
+  // Download metadata JSON
+  const handleDownloadMetadata = (tazo: TazoArt) => {
+    const metadata = {
+      id: tazo.id,
+      name: tazo.name,
+      collection: tazo.collection,
+      rarity: tazo.rarity,
+      role: tazo.role,
+      description: tazo.description,
+      characterAsset: tazo.characterData,
+      frontBackground: tazo.frontalBg,
+      compositedImage: tazo.imageData,
+      backArtwork: `/tazo-assets/back/back-${tazo.collection}.png`,
+      prompt: tazo.prompt,
+      stats: {
+        attack: tazo.attack, defense: tazo.defense, resistance: tazo.resistance,
+        weight: tazo.weight, stability: tazo.stability, spin: tazo.spin,
+        control: tazo.control, bounce: tazo.bounce, precision: tazo.precision,
+      },
+      createdAt: tazo.createdAt,
+    };
+    const blob = new Blob([JSON.stringify(metadata, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `tazo-${tazo.collection}-${tazo.name.toLowerCase().replace(/\s+/g, '-')}-metadata.json`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   // Get filtered gallery
@@ -801,57 +835,88 @@ export default function Home() {
               </DialogHeader>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-                {/* Left: Image with Flip */}
-                <div className="relative bg-[#1a1a1a] p-6 flex flex-col items-center justify-center min-h-[350px]">
-                  {/* Flip Button */}
-                  <button
-                    onClick={() => setShowBack(!showBack)}
-                    className="absolute top-3 right-3 z-20 mag-btn bg-[#fffef0] text-[#1a1a1a] px-2 py-1 text-[9px] flex items-center gap-1"
-                  >
-                    <FlipHorizontal className="w-3 h-3" />
-                    {showBack ? 'FRONT' : 'BACK'}
-                  </button>
-
-                  {/* Card container with flip */}
-                  <div className="relative w-56 h-56 sm:w-64 sm:h-64" style={{ perspective: '800px' }}>
-                    <div
-                      className="w-full h-full transition-transform duration-500"
-                      style={{
-                        transformStyle: 'preserve-3d',
-                        transform: showBack ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                      }}
+                {/* Left: Image with Flip + Creature Toggle */}
+                <div className={`relative p-6 flex flex-col items-center justify-center min-h-[350px] ${showCreatureOnly ? 'checkerboard-bg' : 'bg-[#1a1a1a]'}`}>
+                  {/* Top button row */}
+                  <div className="absolute top-3 right-3 z-20 flex gap-1.5">
+                    {/* Creature-only toggle */}
+                    <button
+                      onClick={() => { setShowCreatureOnly(!showCreatureOnly); setShowBack(false); }}
+                      className={`mag-btn px-2 py-1 text-[9px] flex items-center gap-1 ${
+                        showCreatureOnly
+                          ? 'bg-[#22C55E] text-white'
+                          : 'bg-[#fffef0] text-[#1a1a1a]'
+                      }`}
+                      title="Toggle creature-only view (transparent background)"
                     >
-                      {/* Front */}
-                      <div
-                        className="absolute inset-0 rounded-full overflow-hidden border-4 shadow-[6px_6px_0px_rgba(255,204,0,0.5)]"
-                        style={{
-                          borderColor: selectedTazo.rarity === 'legendary' ? '#FFCC00' : selectedTazo.rarity === 'ultra-rare' ? '#A855F7' : '#fff',
-                          backfaceVisibility: 'hidden',
-                        }}
+                      <Layers className="w-3 h-3" />
+                      {showCreatureOnly ? 'COMPOSITE' : 'CREATURE'}
+                    </button>
+                    {/* Flip Button — only for composited view */}
+                    {!showCreatureOnly && (
+                      <button
+                        onClick={() => setShowBack(!showBack)}
+                        className="mag-btn bg-[#fffef0] text-[#1a1a1a] px-2 py-1 text-[9px] flex items-center gap-1"
                       >
-                        <img
-                          src={`data:image/png;base64,${selectedTazo.imageData}`}
-                          alt={selectedTazo.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-
-                      {/* Back */}
-                      <div
-                        className="absolute inset-0 rounded-full overflow-hidden border-4 border-white shadow-[6px_6px_0px_rgba(255,204,0,0.5)]"
-                        style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
-                      >
-                        <img
-                          src={`/tazo-assets/back/back-${selectedTazo.collection}.png`}
-                          alt={`${selectedTazo.collection} back`}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    </div>
+                        <FlipHorizontal className="w-3 h-3" />
+                        {showBack ? 'FRONT' : 'BACK'}
+                      </button>
+                    )}
                   </div>
 
+                  {showCreatureOnly ? (
+                    /* Creature-only view */
+                    <div className="relative w-64 h-64">
+                      <img
+                        src={`data:image/png;base64,${selectedTazo.characterData}`}
+                        alt={`${selectedTazo.name} — creature only`}
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  ) : (
+                    /* Card container with flip */
+                    <div className="relative w-56 h-56 sm:w-64 sm:h-64" style={{ perspective: '800px' }}>
+                      <div
+                        className="w-full h-full transition-transform duration-500"
+                        style={{
+                          transformStyle: 'preserve-3d',
+                          transform: showBack ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                        }}
+                      >
+                        {/* Front */}
+                        <div
+                          className="absolute inset-0 rounded-full overflow-hidden border-4 shadow-[6px_6px_0px_rgba(255,204,0,0.5)]"
+                          style={{
+                            borderColor: selectedTazo.rarity === 'legendary' ? '#FFCC00' : selectedTazo.rarity === 'ultra-rare' ? '#A855F7' : '#fff',
+                            backfaceVisibility: 'hidden',
+                          }}
+                        >
+                          <img
+                            src={`data:image/png;base64,${selectedTazo.imageData}`}
+                            alt={selectedTazo.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+
+                        {/* Back */}
+                        <div
+                          className="absolute inset-0 rounded-full overflow-hidden border-4 border-white shadow-[6px_6px_0px_rgba(255,204,0,0.5)]"
+                          style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+                        >
+                          <img
+                            src={`/tazo-assets/back/back-${selectedTazo.collection}.png`}
+                            alt={`${selectedTazo.collection} back`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <p className="font-bold text-[10px] uppercase tracking-wider text-zinc-500 mt-3">
-                    Click {showBack ? 'FRONT' : 'BACK'} to flip
+                    {showCreatureOnly
+                      ? 'Creature only — transparent background'
+                      : `Click ${showBack ? 'FRONT' : 'BACK'} to flip`}
                   </p>
                 </div>
 
@@ -975,11 +1040,27 @@ export default function Home() {
                       Front
                     </button>
                     <button
+                      onClick={() => handleDownload(selectedTazo, 'creature')}
+                      className="mag-btn py-2 px-3 text-xs bg-[#22C55E] text-white flex items-center justify-center gap-1.5"
+                      title="Download creature-only PNG with transparent background"
+                    >
+                      <ImageIcon className="w-4 h-4" />
+                      Creature
+                    </button>
+                    <button
                       onClick={() => handleDownload(selectedTazo, 'back')}
                       className="mag-btn py-2 px-3 text-xs bg-[#FF6B00] text-white flex items-center justify-center gap-1.5"
                     >
                       <Download className="w-4 h-4" />
                       Back
+                    </button>
+                    <button
+                      onClick={() => handleDownloadMetadata(selectedTazo)}
+                      className="mag-btn py-2 px-3 text-xs bg-[#fffef0] text-[#1a1a1a] flex items-center justify-center gap-1.5"
+                      title="Download metadata JSON"
+                    >
+                      <BookOpen className="w-4 h-4" />
+                      JSON
                     </button>
                     <button
                       onClick={() => handleDelete(selectedTazo.id)}
