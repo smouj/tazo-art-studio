@@ -1,0 +1,511 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* Magazine Design Tokens */
+  --color-mag-yellow: #FFCC00;
+  --color-mag-red: #E3350D;
+  --color-mag-blue: #3B4CCA;
+  --color-mag-black: #1a1a1a;
+  --color-mag-cream: #fffbe6;
+  --color-mag-white: #fffef0;
+  --color-mag-orange: #FF6B00;
+  --color-mag-cyan: #00A1E9;
+  --color-mag-green: #78C850;
+  --color-mag-purple: #A855F7;
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.646 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ============================================
+   MAGAZINE DESIGN SYSTEM — Trading Tazos Game
+   90s Nintendo Power / Minimon Magazine Aesthetic
+   ============================================ */
+
+/* Backgrounds */
+.mag-bg {
+  background-color: var(--color-mag-cream);
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(255, 204, 0, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(227, 53, 13, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(59, 76, 202, 0.05) 0%, transparent 50%);
+}
+
+.mag-stripes {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 4px,
+    rgba(26, 26, 26, 0.06) 4px,
+    rgba(26, 26, 26, 0.06) 8px
+  );
+}
+
+.mag-dots {
+  background-image: radial-gradient(circle, rgba(26, 26, 26, 0.08) 1px, transparent 1px);
+  background-size: 12px 12px;
+}
+
+.mag-halftone {
+  background-image: radial-gradient(circle, rgba(26, 26, 26, 0.12) 1px, transparent 1px);
+  background-size: 6px 6px;
+}
+
+/* Cards */
+.mag-card {
+  background-color: var(--color-mag-white);
+  border: 3px solid var(--color-mag-black);
+  box-shadow: 4px 4px 0px var(--color-mag-black);
+}
+
+.mag-card-yellow {
+  background-color: var(--color-mag-yellow);
+  border: 3px solid var(--color-mag-black);
+  box-shadow: 4px 4px 0px var(--color-mag-black);
+}
+
+.mag-card-red {
+  background-color: var(--color-mag-red);
+  color: white;
+  border: 3px solid var(--color-mag-black);
+  box-shadow: 4px 4px 0px var(--color-mag-black);
+}
+
+.mag-card-blue {
+  background-color: var(--color-mag-blue);
+  color: white;
+  border: 3px solid var(--color-mag-black);
+  box-shadow: 4px 4px 0px var(--color-mag-black);
+}
+
+/* Buttons */
+.mag-btn {
+  border: 3px solid var(--color-mag-black);
+  box-shadow: 3px 3px 0px var(--color-mag-black);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.1s ease;
+}
+
+.mag-btn:hover {
+  box-shadow: 2px 2px 0px var(--color-mag-black);
+  transform: translate(1px, 1px);
+}
+
+.mag-btn:active {
+  box-shadow: 1px 1px 0px var(--color-mag-black);
+  transform: translate(2px, 2px);
+}
+
+.mag-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 3px 3px 0px var(--color-mag-black);
+}
+
+/* Text Effects */
+.mag-stroke {
+  color: var(--color-mag-yellow);
+  text-shadow:
+    -2px -2px 0 var(--color-mag-black),
+    2px -2px 0 var(--color-mag-black),
+    -2px 2px 0 var(--color-mag-black),
+    2px 2px 0 var(--color-mag-black);
+}
+
+.mag-stroke-red {
+  color: var(--color-mag-red);
+  text-shadow:
+    -2px -2px 0 var(--color-mag-black),
+    2px -2px 0 var(--color-mag-black),
+    -2px 2px 0 var(--color-mag-black),
+    2px 2px 0 var(--color-mag-black);
+}
+
+.mag-stroke-white {
+  color: white;
+  text-shadow:
+    -1.5px -1.5px 0 var(--color-mag-black),
+    1.5px -1.5px 0 var(--color-mag-black),
+    -1.5px 1.5px 0 var(--color-mag-black),
+    1.5px 1.5px 0 var(--color-mag-black);
+}
+
+.mag-stroke-sm {
+  text-shadow:
+    -1px -1px 0 var(--color-mag-black),
+    1px -1px 0 var(--color-mag-black),
+    -1px 1px 0 var(--color-mag-black),
+    1px 1px 0 var(--color-mag-black);
+}
+
+/* Special Effects */
+.mag-lift {
+  transition: all 0.2s ease;
+}
+
+.mag-lift:hover {
+  transform: translateY(-4px) rotate(-1deg);
+  box-shadow: 6px 6px 0px var(--color-mag-black);
+}
+
+.tazo-card-hover {
+  transition: all 0.2s ease;
+}
+
+.tazo-card-hover:hover {
+  transform: translateY(-6px) rotate(-1deg);
+  box-shadow: 6px 6px 0px var(--color-mag-black);
+}
+
+.legendary-glow {
+  animation: legendaryPulse 2s ease-in-out infinite;
+}
+
+@keyframes legendaryPulse {
+  0%, 100% {
+    box-shadow: 4px 4px 0px var(--color-mag-black), 0 0 15px rgba(255, 204, 0, 0.5);
+  }
+  50% {
+    box-shadow: 4px 4px 0px var(--color-mag-black), 0 0 30px rgba(255, 204, 0, 0.8);
+  }
+}
+
+.holo-border {
+  position: relative;
+  overflow: hidden;
+}
+
+.holo-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(
+    45deg,
+    #ff6b6b, #feca57, #48dbfb, #ff9ff3, #ff6b6b
+  );
+  background-size: 400% 400%;
+  animation: holoShimmer 3s linear infinite;
+  z-index: -1;
+  border-radius: inherit;
+}
+
+@keyframes holoShimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.metallic-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.metallic-effect::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 70%
+  );
+  background-size: 200% 200%;
+  animation: metallicShine 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes metallicShine {
+  0%, 100% { background-position: -100% -100%; }
+  50% { background-position: 200% 200%; }
+}
+
+.worn-overlay {
+  position: relative;
+}
+
+.worn-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 30%, transparent 2px, rgba(0,0,0,0.03) 3px, transparent 4px),
+    radial-gradient(circle at 70% 60%, transparent 1px, rgba(0,0,0,0.04) 2px, transparent 3px),
+    radial-gradient(circle at 40% 80%, transparent 3px, rgba(0,0,0,0.02) 4px, transparent 5px);
+  pointer-events: none;
+}
+
+.mag-zigzag {
+  position: relative;
+}
+
+.mag-zigzag::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: linear-gradient(135deg, var(--color-mag-black) 25%, transparent 25%) -4px 0,
+    linear-gradient(225deg, var(--color-mag-black) 25%, transparent 25%) -4px 0,
+    linear-gradient(315deg, var(--color-mag-black) 25%, transparent 25%),
+    linear-gradient(45deg, var(--color-mag-black) 25%, transparent 25%);
+  background-size: 8px 8px;
+}
+
+/* Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--color-mag-cream);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--color-mag-black);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--color-mag-yellow);
+}
+
+/* Franchise Gradients */
+.gradient-minimon {
+  background: linear-gradient(135deg, #FFCB05, #FF8C00);
+}
+
+.gradient-cybermon {
+  background: linear-gradient(135deg, #00A1E9, #0057B7);
+}
+
+.gradient-dracobell {
+  background: linear-gradient(135deg, #FF6B00, #CC4400);
+}
+
+/* Rarity Colors */
+.rarity-common { color: #9CA3AF; }
+.rarity-uncommon { color: #22C55E; }
+.rarity-rare { color: #3B82F6; }
+.rarity-ultra-rare { color: #A855F7; }
+.rarity-legendary { color: #FFCC00; }
+
+/* Tazo disc shape */
+.tazo-disc {
+  border-radius: 50%;
+  border: 3px solid var(--color-mag-black);
+  box-shadow: 3px 3px 0px var(--color-mag-black);
+  overflow: hidden;
+}
+
+/* Stat bar */
+.stat-bar {
+  height: 8px;
+  background: var(--color-mag-black);
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  transition: width 0.5s ease;
+}
+
+/* Color dots row decoration */
+.color-dots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  padding: 8px 0;
+}
+
+.color-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* Exclusive badge */
+.exclusive-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--color-mag-red);
+  color: white;
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  transform: rotate(12deg);
+  border: 2px solid var(--color-mag-black);
+  box-shadow: 2px 2px 0px var(--color-mag-black);
+  z-index: 10;
+}
+
+/* Speech bubble */
+.speech-bubble {
+  position: relative;
+  background: white;
+  border: 2px solid var(--color-mag-black);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 16px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid var(--color-mag-black);
+}
+
+/* Mag spinner */
+.mag-spinner {
+  animation: magSpin 0.8s linear infinite;
+}
+
+@keyframes magSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Page transition */
+.page-enter {
+  animation: pageIn 0.3s ease-out;
+}
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
