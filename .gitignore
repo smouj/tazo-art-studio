@@ -1,7 +1,5 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-node_modules
+# Dependencies
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -10,61 +8,62 @@ node_modules
 !.yarn/releases
 !.yarn/versions
 
-# testing
+# Testing
 /coverage
 
-# next.js
+# Next.js
 /.next/
 /out/
 
-# production
+# Production
 /build
 
-# misc
+# Misc
 .DS_Store
 *.pem
 
-# debug
+# Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files
+# Environment variables — NEVER commit secrets
 .env
 .env*.local
+.env.production
+.env.staging
 
-# vercel
+# Vercel
 .vercel
 
-# typescript
+# TypeScript
 *.tsbuildinfo
 next-env.d.ts
 
-# logs
+# Logs
 *.log
 dev.log
 dev.out.log
 server.log
 
 # IDE
-.claude
+.vscode/
+.idea/
+.claude/
 .z-ai-config
 
-# Skills directory
+# Sandbox / platform-specific (NOT part of the project)
 /skills/
-
-# Upload directory (temp files)
 /upload/
-
-# Examples
+/download/
 /examples/
+/mini-services/
+/.zscripts/
+/worklog.md
 
-# Database
+# Database (local SQLite — generated on first run)
 db/
 
-# Mini services
-/mini-services/
-
-# Worklog
-worklog.md
+# Caddy / reverse proxy config (platform-specific)
+Caddyfile

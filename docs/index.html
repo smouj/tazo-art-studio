@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tazo Art Studio — AI-Powered Tazo Art Creator</title>
+  <meta name="description" content="Create, collect, and battle with AI-generated tazo art cards. Three iconic collections inspired by 90s pop culture.">
+  <meta name="keywords" content="tazo, ai-art, trading-cards, pokemon, dragon-ball, digimon, image-generation">
+  <meta property="og:title" content="Tazo Art Studio">
+  <meta property="og:description" content="AI-Powered Tazo Art Creator for Trading Tazos Game">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://smouj.github.io/tazo-art-studio/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --yellow: #FFCC00;
+      --red: #E3350D;
+      --blue: #3B4CCA;
+      --orange: #FF6B00;
+      --cyan: #00A1E9;
+      --black: #1A1A1A;
+      --cream: #FFFBE6;
+      --green: #22C55E;
+      --purple: #A855F7;
+      --gray: #6B7280;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--cream);
+      color: var(--black);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Halftone pattern overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, var(--black) 0.5px, transparent 0.5px);
+      background-size: 20px 20px;
+      opacity: 0.03;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* Magazine stripe header bg */
+    .mag-stripes {
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 10px,
+        rgba(255,204,0,0.08) 10px,
+        rgba(255,204,0,0.08) 20px
+      );
+    }
+
+    /* Header */
+    .header {
+      background: var(--black);
+      border-bottom: 4px solid var(--yellow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-disc {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--yellow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      border: 3px solid var(--yellow);
+      box-shadow: 3px 3px 0 var(--yellow);
+      animation: spin 8s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .logo-text h1 {
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      color: var(--yellow);
+    }
+
+    .logo-text p {
+      font-weight: 700;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #9CA3AF;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-links a {
+      font-weight: 700;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 8px 16px;
+      border: 2px solid var(--black);
+      background: transparent;
+      color: #9CA3AF;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .nav-links a:hover {
+      background: var(--yellow);
+      color: var(--black);
+      border-color: var(--yellow);
+      box-shadow: 3px 3px 0 rgba(255,204,0,0.4);
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      padding: 80px 24px;
+      text-align: center;
+      background: linear-gradient(135deg, var(--black) 0%, #2d2d2d 100%);
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 30px,
+        rgba(255,204,0,0.03) 30px,
+        rgba(255,204,0,0.03) 60px
+      );
+    }
+
+    .hero-content {
+      position: relative;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero h2 {
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 3rem;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin-bottom: 16px;
+      line-height: 1.1;
+      text-shadow: 3px 3px 0 rgba(255,204,0,0.3);
+    }
+
+    .hero .tagline {
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      color: #9CA3AF;
+      margin-bottom: 32px;
+    }
+
+    .hero .description {
+      font-size: 1.1rem;
+      color: #d1d5db;
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.8;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 14px 32px;
+      background: var(--yellow);
+      color: var(--black);
+      border: 3px solid var(--black);
+      box-shadow: 4px 4px 0 var(--black);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-primary:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 var(--black);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      padding: 14px 32px;
+      background: transparent;
+      color: var(--yellow);
+      border: 2px solid var(--yellow);
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-secondary:hover {
+      background: var(--yellow);
+      color: var(--black);
+    }
+
+    /* Collections */
+    .collections {
+      padding: 80px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 1.8rem;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .section-subtitle {
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--gray);
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .collections-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .collection-card {
+      border: 3px solid var(--black);
+      background: white;
+      box-shadow: 4px 4px 0 var(--black);
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .collection-card:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 var(--black);
+    }
+
+    .collection-banner {
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .collection-banner.minimon {
+      background: linear-gradient(135deg, #FFCC00, #FF9500);
+    }
+
+    .collection-banner.dracobell {
+      background: linear-gradient(135deg, #FF6B00, #E3350D);
+    }
+
+    .collection-banner.cybermon {
+      background: linear-gradient(135deg, #00A1E9, #3B4CCA);
+    }
+
+    .collection-banner .emoji {
+      font-size: 64px;
+      filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.2));
+    }
+
+    .collection-info {
+      padding: 20px;
+    }
+
+    .collection-info h3 {
+      font-weight: 700;
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .collection-info .inspired {
+      font-weight: 700;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--gray);
+      margin-bottom: 12px;
+    }
+
+    .collection-info p {
+      font-size: 0.9rem;
+      color: #4B5563;
+      line-height: 1.6;
+    }
+
+    .collection-stats {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 2px solid #f3f4f6;
+    }
+
+    .collection-stat {
+      text-align: center;
+      flex: 1;
+    }
+
+    .collection-stat .number {
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--black);
+    }
+
+    .collection-stat .label {
+      font-weight: 700;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--gray);
+    }
+
+    /* Rarity */
+    .rarity-section {
+      padding: 80px 24px;
+      background: var(--black);
+      color: white;
+    }
+
+    .rarity-section .section-title {
+      color: var(--yellow);
+    }
+
+    .rarity-section .section-subtitle {
+      color: #6B7280;
+    }
+
+    .rarity-grid {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 16px;
+    }
+
+    .rarity-card {
+      border: 2px solid #374151;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .rarity-card:hover {
+      border-color: var(--yellow);
+      transform: translateY(-2px);
+    }
+
+    .rarity-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      margin: 0 auto 12px;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+
+    .rarity-card h4 {
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
+    }
+
+    .rarity-card p {
+      font-size: 0.75rem;
+      color: #9CA3AF;
+      line-height: 1.5;
+    }
+
+    .rarity-card.legendary .rarity-dot {
+      animation: legendary-pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes legendary-pulse {
+      0%, 100% { box-shadow: 0 0 8px rgba(255,204,0,0.4); }
+      50% { box-shadow: 0 0 20px rgba(255,204,0,0.8); }
+    }
+
+    /* How it works */
+    .how-it-works {
+      padding: 80px 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .step {
+      text-align: center;
+      padding: 24px;
+      border: 3px solid var(--black);
+      background: white;
+      box-shadow: 4px 4px 0 var(--black);
+      position: relative;
+    }
+
+    .step-number {
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 2rem;
+      color: var(--yellow);
+      text-shadow: 2px 2px 0 var(--black);
+    }
+
+    .step h4 {
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 8px 0;
+    }
+
+    .step p {
+      font-size: 0.8rem;
+      color: #6B7280;
+      line-height: 1.5;
+    }
+
+    /* Tech stack */
+    .tech-stack {
+      padding: 80px 24px;
+      background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+    }
+
+    .tech-grid {
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .tech-item {
+      background: white;
+      border: 2px solid var(--black);
+      padding: 20px;
+      text-align: center;
+      box-shadow: 2px 2px 0 var(--black);
+    }
+
+    .tech-item .icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .tech-item h4 {
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .tech-item p {
+      font-size: 0.7rem;
+      color: #6B7280;
+      margin-top: 4px;
+    }
+
+    /* Stats section */
+    .stats-section {
+      padding: 60px 24px;
+      background: var(--yellow);
+      border-top: 4px solid var(--black);
+      border-bottom: 4px solid var(--black);
+    }
+
+    .stats-grid {
+      max-width: 800px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      text-align: center;
+    }
+
+    .stat-item .number {
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 2.5rem;
+      color: var(--black);
+    }
+
+    .stat-item .label {
+      font-weight: 700;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: rgba(26,26,26,0.7);
+    }
+
+    /* CTA */
+    .cta {
+      padding: 80px 24px;
+      text-align: center;
+      background: var(--black);
+    }
+
+    .cta h2 {
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      font-size: 2rem;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin-bottom: 16px;
+    }
+
+    .cta p {
+      color: #9CA3AF;
+      max-width: 500px;
+      margin: 0 auto 32px;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--black);
+      border-top: 4px solid var(--yellow);
+      padding: 32px 24px;
+      text-align: center;
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .footer-logo span {
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--yellow);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+
+    .footer-links a {
+      font-weight: 700;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #6B7280;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .footer-links a:hover { color: var(--yellow); }
+
+    .footer-copy {
+      font-size: 0.7rem;
+      color: #4B5563;
+    }
+
+    .color-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .color-dots span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h2 { font-size: 2rem; }
+      .nav-links { display: none; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .header-inner { padding: 12px 16px; }
+    }
+
+    @media (max-width: 480px) {
+      .hero h2 { font-size: 1.5rem; }
+      .hero .tagline { font-size: 0.8rem; letter-spacing: 2px; }
+      .collections-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo-group">
+        <div class="logo-disc">🎴</div>
+        <div class="logo-text">
+          <h1>Tazo Art Studio</h1>
+          <p>Create &middot; Collect &middot; Battle</p>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="#collections">Collections</a>
+        <a href="#rarity">Rarity</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#tech">Tech</a>
+        <a href="https://github.com/smouj/tazo-art-studio" target="_blank">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <h2>Tazo Art Studio</h2>
+      <p class="tagline">Create &middot; Collect &middot; Battle</p>
+      <p class="description">
+        AI-powered tazo art creator for the Trading Tazos Game.
+        Generate unique characters across three iconic collections with
+        authentic 90s magazine aesthetic.
+      </p>
+      <div class="hero-buttons">
+        <a href="https://github.com/smouj/tazo-art-studio" target="_blank" class="btn-primary">
+          ⭐ View on GitHub
+        </a>
+        <a href="https://github.com/smouj/Trading-Tazos-Game" target="_blank" class="btn-secondary">
+          🎮 Trading Tazos Game
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Bar -->
+  <section class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="number">3</div>
+        <div class="label">Collections</div>
+      </div>
+      <div class="stat-item">
+        <div class="number">5</div>
+        <div class="label">Rarity Tiers</div>
+      </div>
+      <div class="stat-item">
+        <div class="number">8</div>
+        <div class="label">Combat Roles</div>
+      </div>
+      <div class="stat-item">
+        <div class="number">9</div>
+        <div class="label">Stats</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Collections -->
+  <section class="collections" id="collections">
+    <h2 class="section-title">Three Iconic Collections</h2>
+    <p class="section-subtitle">Choose your universe &middot; Create your champions</p>
+    <div class="collections-grid">
+      <div class="collection-card">
+        <div class="collection-banner minimon">
+          <span class="emoji">⚡</span>
+        </div>
+        <div class="collection-info">
+          <h3>Minimon</h3>
+          <div class="inspired">Inspired by Pokémon</div>
+          <p>Electric mice, flame lizards, and mystical creatures. The original pocket monster collection with 6 unique frontal backgrounds.</p>
+          <div class="collection-stats">
+            <div class="collection-stat">
+              <div class="number">6</div>
+              <div class="label">Backgrounds</div>
+            </div>
+            <div class="collection-stat">
+              <div class="number">6</div>
+              <div class="label">Presets</div>
+            </div>
+            <div class="collection-stat">
+              <div class="number" style="color: var(--orange);">🟡</div>
+              <div class="label">Theme</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="collection-card">
+        <div class="collection-banner dracobell">
+          <span class="emoji">🔥</span>
+        </div>
+        <div class="collection-info">
+          <h3>Dracobell</h3>
+          <div class="inspired">Inspired by Dragon Ball</div>
+          <p>Spiky-haired warriors, golden auras, and epic transformations. The martial arts collection with 4 dynamic frontal backgrounds.</p>
+          <div class="collection-stats">
+            <div class="collection-stat">
+              <div class="number">4</div>
+              <div class="label">Backgrounds</div>
+            </div>
+            <div class="collection-stat">
+              <div class="number">6</div>
+              <div class="label">Presets</div>
+            </div>
+            <div class="collection-stat">
+              <div class="number" style="color: var(--red);">🟠</div>
+              <div class="label">Theme</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="collection-card">
+        <div class="collection-banner cybermon">
+          <span class="emoji">💎</span>
+        </div>
+        <div class="collection-info">
+          <h3>Cybermon</h3>
+          <div class="inspired">Inspired by Digimon</div>
+          <p>Digital dinosaurs, cyber-angels, and chrome wolves. The digital world collection with 3 high-tech frontal backgrounds.</p>
+          <div class="collection-stats">
+            <div class="collection-stat">
+              <div class="number">3</div>
+              <div class="label">Backgrounds</div>
+            </div>
+            <div class="collection-stat">
+              <div class="number">6</div>
+              <div class="label">Presets</div>
+            </div>
+            <div class="collection-stat">
+              <div class="number" style="color: var(--cyan);">🔵</div>
+              <div class="label">Theme</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rarity -->
+  <section class="rarity-section" id="rarity">
+    <h2 class="section-title">Five Rarity Tiers</h2>
+    <p class="section-subtitle">From common to legendary &middot; Each with unique visual effects</p>
+    <div class="rarity-grid">
+      <div class="rarity-card">
+        <div class="rarity-dot" style="background: #9CA3AF;"></div>
+        <h4>Common</h4>
+        <p>Standard card with clean design</p>
+      </div>
+      <div class="rarity-card">
+        <div class="rarity-dot" style="background: #22C55E;"></div>
+        <h4>Uncommon</h4>
+        <p>Subtle shimmer effect</p>
+      </div>
+      <div class="rarity-card">
+        <div class="rarity-dot" style="background: #3B82F6;"></div>
+        <h4>Rare</h4>
+        <p>Holographic border glow</p>
+      </div>
+      <div class="rarity-card">
+        <div class="rarity-dot" style="background: #A855F7;"></div>
+        <h4>Ultra-Rare</h4>
+        <p>Metallic glow effect</p>
+      </div>
+      <div class="rarity-card legendary">
+        <div class="rarity-dot" style="background: #FFCC00;"></div>
+        <h4>Legendary</h4>
+        <p>Animated golden glow + particles</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-it-works" id="how-it-works">
+    <h2 class="section-title">How It Works</h2>
+    <p class="section-subtitle">From idea to tazo in 5 simple steps</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">01</div>
+        <h4>Choose Collection</h4>
+        <p>Pick Minimon, Dracobell, or Cybermon as your tazo universe</p>
+      </div>
+      <div class="step">
+        <div class="step-number">02</div>
+        <h4>Design Character</h4>
+        <p>Name your tazo and describe its appearance in detail</p>
+      </div>
+      <div class="step">
+        <div class="step-number">03</div>
+        <h4>Set Stats</h4>
+        <p>Choose rarity tier and combat role for stat distribution</p>
+      </div>
+      <div class="step">
+        <div class="step-number">04</div>
+        <h4>AI Generates</h4>
+        <p>AI creates the character and composites it onto a real tazo background</p>
+      </div>
+      <div class="step">
+        <div class="step-number">05</div>
+        <h4>Collect & Battle</h4>
+        <p>Your tazo is ready! View front & back, download, or add to favorites</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Stack -->
+  <section class="tech-stack" id="tech">
+    <h2 class="section-title">Built With</h2>
+    <p class="section-subtitle">Modern web technologies &middot; 90s aesthetic</p>
+    <div class="tech-grid">
+      <div class="tech-item">
+        <div class="icon">▲</div>
+        <h4>Next.js 16</h4>
+        <p>App Router</p>
+      </div>
+      <div class="tech-item">
+        <div class="icon">🔷</div>
+        <h4>TypeScript 5</h4>
+        <p>Strict Mode</p>
+      </div>
+      <div class="tech-item">
+        <div class="icon">🎨</div>
+        <h4>Tailwind CSS 4</h4>
+        <p>90s Magazine Theme</p>
+      </div>
+      <div class="tech-item">
+        <div class="icon">🤖</div>
+        <h4>AI Generation</h4>
+        <p>z-ai-web-dev-sdk</p>
+      </div>
+      <div class="tech-item">
+        <div class="icon">🖼️</div>
+        <h4>Sharp</h4>
+        <p>Image Compositing</p>
+      </div>
+      <div class="tech-item">
+        <div class="icon">💎</div>
+        <h4>Prisma</h4>
+        <p>ORM + SQLite</p>
+      </div>
+      <div class="tech-item">
+        <div class="icon">🧩</div>
+        <h4>shadcn/ui</h4>
+        <p>Radix Components</p>
+      </div>
+      <div class="tech-item">
+        <div class="icon">✨</div>
+        <h4>Framer Motion</h4>
+        <p>Animations</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta">
+    <h2>Ready to Create?</h2>
+    <p>Clone the repo, set up your environment, and start generating unique tazo art in minutes.</p>
+    <div class="hero-buttons">
+      <a href="https://github.com/smouj/tazo-art-studio" target="_blank" class="btn-primary">
+        🚀 Get Started
+      </a>
+      <a href="https://github.com/smouj/tazo-art-studio/blob/main/README.md" target="_blank" class="btn-secondary">
+        📖 Read the Docs
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <span>🎴 Tazo Art Studio</span>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/smouj/tazo-art-studio">GitHub</a>
+        <a href="https://github.com/smouj/Trading-Tazos-Game">Trading Tazos Game</a>
+        <a href="https://github.com/smouj/tazo-art-studio/blob/main/LICENSE">License</a>
+        <a href="https://github.com/smouj/tazo-art-studio/blob/main/CONTRIBUTING.md">Contributing</a>
+      </div>
+      <div class="color-dots">
+        <span style="background: #FFCC00;"></span>
+        <span style="background: #E3350D;"></span>
+        <span style="background: #3B4CCA;"></span>
+        <span style="background: #FF6B00;"></span>
+        <span style="background: #00A1E9;"></span>
+      </div>
+      <p class="footer-copy">&copy; 2025 smouj &middot; Made with ❤️ and 90s nostalgia</p>
+    </div>
+  </footer>
+
+</body>
+</html>
