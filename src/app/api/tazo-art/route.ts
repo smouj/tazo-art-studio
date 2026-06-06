@@ -1,5 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import path from 'path';
+import fs from 'fs';
+
+// Frontal background files per collection
+const FRONTAL_BG_FILES: Record<string, string[]> = {
+  minimon: ['minimon-01.png', 'minimon-02.png', 'minimon-03.png', 'minimon-04.png', 'minimon-05.png', 'minimon-06.png'],
+  dracobell: ['dracobell-01.png', 'dracobell-02.png', 'dracobell-03.png', 'dracobell-04.png'],
+  cybermon: ['cybermon-01.png', 'cybermon-02.png', 'cybermon-03.png'],
+  special: ['special-01.png'],
+};
 
 // GET - List all tazo arts
 export async function GET() {
@@ -28,7 +38,6 @@ export async function POST(request: NextRequest) {
       role,
       description,
       customPrompt,
-      stats,
     } = body;
 
     // Validate required fields
@@ -71,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     const prompt = customPrompt
       ? customPrompt
-      : `Circular tazo disc art: ${name}, ${description}. ${baseStyle}. ${rarityStyle}. ${roleStyle}. Vintage 90s collectible tazo design, circular composition, bold outlines, high contrast, detailed illustration on white background, official tazo card art style, high quality, detailed, centered composition fitting a circular frame`;
+      : `Character illustration for collectible tazo disc: ${name}, ${description}. ${baseStyle}. ${rarityStyle}. ${roleStyle}. Character centered on transparent background, full body character art, bold outlines, high contrast, detailed anime illustration style, official collectible card art, high quality, detailed, character design`;
 
     // Generate image using z-ai-web-dev-sdk
     const ZAI = (await import('z-ai-web-dev-sdk')).default;
@@ -82,12 +91,65 @@ export async function POST(request: NextRequest) {
       size: '1024x1024',
     });
 
-    const imageBase64 = response.data[0].base64;
+    const characterBase64 = response.data[0].base64;
+
+    // Select a random frontal background for this collection
+    const bgFiles = FRONTAL_BG_FILES[collection] || FRONTAL_BG_FILES.minimon;
+    // For legendary/ultra-rare, allow special backgrounds too
+    const availableBgs = (rarity === 'legendary' || rarity === 'ultra-rare')
+      ? [...bgFiles, ...FRONTAL_BG_FILES.special]
+      : bgFiles;
+    const selectedBg = availableBgs[Math.floor(Math.random() * availableBgs.length)];
+
+    // Composite character onto frontal background using sharp
+    let compositedBase64: string;
+    try {
+      const sharp = (await import('sharp')).default;
+
+      // Load the frontal background
+      const bgPath = path.join(process.cwd(), 'public', 'tazo-assets', 'frontal', collection, selectedBg);
+      // Fallback to special if the collection-specific one doesn't exist
+      const actualBgPath = fs.existsSync(bgPath)
+        ? bgPath
+        : path.join(process.cwd(), 'public', 'tazo-assets', 'frontal', 'special', selectedBg);
+
+      if (fs.existsSync(actualBgPath)) {
+        const bgBuffer = fs.readFileSync(actualBgPath);
+        const bgImage = sharp(bgBuffer);
+        const bgMetadata = await bgImage.metadata();
+
+        // Resize character to fit inside the background (about 65% of bg size, centered)
+        const bgSize = bgMetadata.width || 1254;
+        const charSize = Math.round(bgSize * 0.65);
+        const offset = Math.round((bgSize - charSize) / 2);
+
+        const characterBuffer = Buffer.from(characterBase64, 'base64');
+        const resizedCharacter = await sharp(characterBuffer)
+          .resize(charSize, charSize, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+          .png()
+          .toBuffer();
+
+        // Composite: character on top of background
+        const compositedBuffer = await bgImage
+          .composite([{
+            input: resizedCharacter,
+            left: offset,
+            top: offset,
+          }])
+          .png()
+          .toBuffer();
+
+        compositedBase64 = compositedBuffer.toString('base64');
+      } else {
+        // No background found, use character as-is
+        compositedBase64 = characterBase64;
+      }
+    } catch (compositeError) {
+      console.error('Compositing error, using raw character:', compositeError);
+      compositedBase64 = characterBase64;
+    }
 
     // Generate balanced stats based on role
-    const generateStat = (base: number, variance: number) =>
-      Math.max(10, Math.min(99, base + Math.floor(Math.random() * variance * 2) - variance));
-
     const roleStats: Record<string, Record<string, number>> = {
       attacker: { attack: 80, defense: 35, resistance: 40, weight: 50, stability: 35, spin: 55, control: 45, bounce: 40, precision: 60 },
       tank: { attack: 35, defense: 85, resistance: 80, weight: 75, stability: 70, spin: 30, control: 40, bounce: 25, precision: 35 },
@@ -112,20 +174,18 @@ export async function POST(request: NextRequest) {
 
     const multiplier = rarityMultiplier[rarity] || 1.0;
 
+    const clamp = (v: number) => Math.max(10, Math.min(99, v));
     const finalStats = {
-      attack: Math.min(99, Math.round(baseStats.attack * multiplier + (Math.random() * 10 - 5))),
-      defense: Math.min(99, Math.round(baseStats.defense * multiplier + (Math.random() * 10 - 5))),
-      resistance: Math.min(99, Math.round(baseStats.resistance * multiplier + (Math.random() * 10 - 5))),
-      weight: Math.min(99, Math.round(baseStats.weight * multiplier + (Math.random() * 10 - 5))),
-      stability: Math.min(99, Math.round(baseStats.stability * multiplier + (Math.random() * 10 - 5))),
-      spin: Math.min(99, Math.round(baseStats.spin * multiplier + (Math.random() * 10 - 5))),
-      control: Math.min(99, Math.round(baseStats.control * multiplier + (Math.random() * 10 - 5))),
-      bounce: Math.min(99, Math.round(baseStats.bounce * multiplier + (Math.random() * 10 - 5))),
-      precision: Math.min(99, Math.round(baseStats.precision * multiplier + (Math.random() * 10 - 5))),
+      attack: clamp(Math.round(baseStats.attack * multiplier + (Math.random() * 10 - 5))),
+      defense: clamp(Math.round(baseStats.defense * multiplier + (Math.random() * 10 - 5))),
+      resistance: clamp(Math.round(baseStats.resistance * multiplier + (Math.random() * 10 - 5))),
+      weight: clamp(Math.round(baseStats.weight * multiplier + (Math.random() * 10 - 5))),
+      stability: clamp(Math.round(baseStats.stability * multiplier + (Math.random() * 10 - 5))),
+      spin: clamp(Math.round(baseStats.spin * multiplier + (Math.random() * 10 - 5))),
+      control: clamp(Math.round(baseStats.control * multiplier + (Math.random() * 10 - 5))),
+      bounce: clamp(Math.round(baseStats.bounce * multiplier + (Math.random() * 10 - 5))),
+      precision: clamp(Math.round(baseStats.precision * multiplier + (Math.random() * 10 - 5))),
     };
-
-    // Override with provided stats if any
-    const mergedStats = stats ? { ...finalStats, ...stats } : finalStats;
 
     // Save to database
     const tazoArt = await db.tazoArt.create({
@@ -136,8 +196,10 @@ export async function POST(request: NextRequest) {
         role,
         description,
         prompt,
-        imageData: imageBase64,
-        ...mergedStats,
+        imageData: compositedBase64,
+        characterData: characterBase64,
+        frontalBg: selectedBg,
+        ...finalStats,
       },
     });
 

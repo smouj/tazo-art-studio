@@ -29,24 +29,26 @@ model Post {
 }
 
 model TazoArt {
-  id          String   @id @default(cuid())
-  name        String
-  collection  String   // minimon, dracobell, cybermon
-  rarity      String   // common, uncommon, rare, ultra-rare, legendary
-  role        String   // attacker, tank, technical, bouncer, heavy, light, balanced, special
-  description String
-  prompt      String   // The AI prompt used for generation
-  imageData   String   // Base64 encoded image data
-  attack      Int      @default(50)
-  defense     Int      @default(50)
-  resistance  Int      @default(50)
-  weight      Int      @default(50)
-  stability   Int      @default(50)
-  spin        Int      @default(50)
-  control     Int      @default(50)
-  bounce      Int      @default(50)
-  precision   Int      @default(50)
-  isFavorite  Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  collection    String   // minimon, dracobell, cybermon
+  rarity        String   // common, uncommon, rare, ultra-rare, legendary
+  role          String   // attacker, tank, technical, bouncer, heavy, light, balanced, special
+  description   String
+  prompt        String   // The AI prompt used for generation
+  imageData     String   // Base64 encoded final composited image (front with bg)
+  characterData String   // Base64 encoded raw AI character image (no bg)
+  frontalBg     String   // Filename of the frontal background used e.g. "minimon-01.png"
+  attack        Int      @default(50)
+  defense       Int      @default(50)
+  resistance    Int      @default(50)
+  weight        Int      @default(50)
+  stability     Int      @default(50)
+  spin          Int      @default(50)
+  control       Int      @default(50)
+  bounce        Int      @default(50)
+  precision     Int      @default(50)
+  isFavorite    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

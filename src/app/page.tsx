@@ -5,13 +5,12 @@ import {
   Sparkles, Palette, Disc3, Trash2, Star, ChevronDown,
   Swords, Shield, Zap, Weight, Anchor, RotateCw, Target,
   ArrowUpDown, Crosshair, Loader2, Download, Heart,
-  BookOpen, X, Plus, Wand2, Layers
+  BookOpen, X, Plus, Wand2, Layers, FlipHorizontal, Image as ImageIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
@@ -21,7 +20,6 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 
 // Types
@@ -34,6 +32,8 @@ interface TazoArt {
   description: string;
   prompt: string;
   imageData: string;
+  characterData: string;
+  frontalBg: string;
   attack: number;
   defense: number;
   resistance: number;
@@ -50,17 +50,17 @@ interface TazoArt {
 
 // Constants
 const COLLECTIONS = [
-  { id: 'minimon', name: 'Minimon', gradient: 'gradient-minimon', color: '#FFCB05', icon: '🟡', desc: 'Pokemon-inspired creatures' },
-  { id: 'dracobell', name: 'Dracobell', gradient: 'gradient-dracobell', color: '#FF6B00', icon: '🟠', desc: 'Dragon Ball warriors' },
-  { id: 'cybermon', name: 'Cybermon', gradient: 'gradient-cybermon', color: '#00A1E9', icon: '🔵', desc: 'Digital monsters' },
+  { id: 'minimon', name: 'Minimon', gradient: 'gradient-minimon', color: '#FFCB05', desc: 'Pokemon-inspired creatures', bgCount: 6 },
+  { id: 'dracobell', name: 'Dracobell', gradient: 'gradient-dracobell', color: '#FF6B00', desc: 'Dragon Ball warriors', bgCount: 4 },
+  { id: 'cybermon', name: 'Cybermon', gradient: 'gradient-cybermon', color: '#00A1E9', desc: 'Digital monsters', bgCount: 3 },
 ];
 
 const RARITIES = [
-  { id: 'common', name: 'Common', color: '#9CA3AF', bg: 'bg-zinc-200', border: 'border-zinc-400' },
-  { id: 'uncommon', name: 'Uncommon', color: '#22C55E', bg: 'bg-green-100', border: 'border-green-400' },
-  { id: 'rare', name: 'Rare', color: '#3B82F6', bg: 'bg-blue-100', border: 'border-blue-400' },
-  { id: 'ultra-rare', name: 'Ultra-Rare', color: '#A855F7', bg: 'bg-purple-100', border: 'border-purple-400' },
-  { id: 'legendary', name: 'Legendary', color: '#FFCC00', bg: 'bg-yellow-100', border: 'border-yellow-400' },
+  { id: 'common', name: 'Common', color: '#9CA3AF' },
+  { id: 'uncommon', name: 'Uncommon', color: '#22C55E' },
+  { id: 'rare', name: 'Rare', color: '#3B82F6' },
+  { id: 'ultra-rare', name: 'Ultra-Rare', color: '#A855F7' },
+  { id: 'legendary', name: 'Legendary', color: '#FFCC00' },
 ];
 
 const ROLES = [
@@ -129,9 +129,11 @@ export default function Home() {
   const [description, setDescription] = useState('');
   const [customPrompt, setCustomPrompt] = useState('');
   const [useCustomPrompt, setUseCustomPrompt] = useState(false);
+  const [selectedBgIndex, setSelectedBgIndex] = useState(0);
 
   // Detail modal
   const [selectedTazo, setSelectedTazo] = useState<TazoArt | null>(null);
+  const [showBack, setShowBack] = useState(false);
 
   // Gallery filter
   const [galleryFilter, setGalleryFilter] = useState<string>('all');
@@ -190,7 +192,6 @@ export default function Home() {
         });
         setTazoArts(prev => [data.data, ...prev]);
         setActiveTab('gallery');
-        // Reset form
         setName('');
         setDescription('');
         setCustomPrompt('');
@@ -241,10 +242,15 @@ export default function Home() {
   };
 
   // Download tazo image
-  const handleDownload = (tazo: TazoArt) => {
+  const handleDownload = (tazo: TazoArt, side: 'front' | 'back') => {
     const link = document.createElement('a');
-    link.href = `data:image/png;base64,${tazo.imageData}`;
-    link.download = `tazo-${tazo.collection}-${tazo.name.toLowerCase().replace(/\s+/g, '-')}.png`;
+    if (side === 'front') {
+      link.href = `data:image/png;base64,${tazo.imageData}`;
+      link.download = `tazo-${tazo.collection}-${tazo.name.toLowerCase().replace(/\s+/g, '-')}-front.png`;
+    } else {
+      link.href = `/tazo-assets/back/back-${tazo.collection}.png`;
+      link.download = `tazo-${tazo.collection}-${tazo.name.toLowerCase().replace(/\s+/g, '-')}-back.png`;
+    }
     link.click();
   };
 
@@ -273,6 +279,14 @@ export default function Home() {
     if (value >= 60) return '#FFCC00';
     if (value >= 40) return '#FF6B00';
     return '#E3350D';
+  };
+
+  // Get frontal bg preview URL for form
+  const getFrontalBgPreview = () => {
+    const colInfo = getCollectionInfo(collection);
+    if (!colInfo) return '';
+    const idx = (selectedBgIndex % colInfo.bgCount) + 1;
+    return `/tazo-assets/frontal/${collection}/${collection}-${idx.toString().padStart(2, '0')}.png`;
   };
 
   return (
@@ -351,7 +365,7 @@ export default function Home() {
                     {COLLECTIONS.map(col => (
                       <button
                         key={col.id}
-                        onClick={() => { setCollection(col.id); setDescription(''); }}
+                        onClick={() => { setCollection(col.id); setDescription(''); setSelectedBgIndex(0); }}
                         className={`p-4 border-3 border-[#1a1a1a] transition-all text-left ${
                           collection === col.id
                             ? `${col.gradient} shadow-[4px_4px_0px_#1a1a1a] scale-[1.02]`
@@ -363,6 +377,9 @@ export default function Home() {
                         </div>
                         <div className="font-bold text-[10px] uppercase tracking-wider text-zinc-600">
                           {col.desc}
+                        </div>
+                        <div className="font-bold text-[9px] uppercase tracking-wider text-zinc-500 mt-1">
+                          {col.bgCount} backgrounds
                         </div>
                       </button>
                     ))}
@@ -446,9 +463,10 @@ export default function Home() {
                           onClick={() => setRarity(r.id)}
                           className={`w-full flex items-center gap-3 p-2.5 border-2 transition-all text-left ${
                             rarity === r.id
-                              ? `border-[#1a1a1a] shadow-[3px_3px_0px_#1a1a1a] ${r.bg}`
+                              ? `border-[#1a1a1a] shadow-[3px_3px_0px_#1a1a1a]`
                               : 'border-transparent hover:bg-zinc-50'
                           }`}
+                          style={rarity === r.id ? { backgroundColor: r.color + '20' } : {}}
                         >
                           <div
                             className="w-3 h-3 rounded-full border-2 border-[#1a1a1a] flex-shrink-0"
@@ -495,26 +513,25 @@ export default function Home() {
 
               {/* Right: Preview Panel */}
               <div className="space-y-5">
-                {/* Live Preview */}
+                {/* Live Preview with Frontal BG */}
                 <div className="mag-card p-5 sm:p-6">
                   <h3 className="font-black text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
-                    <Disc3 className="w-4 h-4" />
-                    Preview
+                    <ImageIcon className="w-4 h-4" />
+                    Front Preview
                   </h3>
 
-                  {/* Tazo Disc Preview */}
-                  <div className="flex justify-center mb-4">
-                    <div
-                      className={`w-40 h-40 sm:w-48 sm:h-48 rounded-full border-4 border-[#1a1a1a] flex items-center justify-center relative overflow-hidden shadow-[4px_4px_0px_#1a1a1a] ${
-                        collection === 'minimon' ? 'gradient-minimon' :
-                        collection === 'dracobell' ? 'gradient-dracobell' : 'gradient-cybermon'
-                      }`}
-                    >
-                      {rarity === 'legendary' && <div className="legendary-glow absolute inset-0" />}
-                      {rarity === 'ultra-rare' && <div className="holo-border absolute inset-0" />}
-                      <div className="text-center z-10">
+                  {/* Tazo Disc Preview with real background */}
+                  <div className="flex justify-center mb-3">
+                    <div className="relative w-44 h-44 sm:w-52 sm:h-52">
+                      <img
+                        src={getFrontalBgPreview()}
+                        alt="Frontal background"
+                        className="w-full h-full rounded-full border-4 border-[#1a1a1a] shadow-[4px_4px_0px_#1a1a1a] object-cover"
+                      />
+                      {/* Name overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center">
                         {name ? (
-                          <span className="font-black text-lg uppercase tracking-wider text-white mag-stroke-sm">
+                          <span className="font-black text-base uppercase tracking-wider text-white mag-stroke-sm text-center px-4">
                             {name}
                           </span>
                         ) : (
@@ -524,8 +541,43 @@ export default function Home() {
                     </div>
                   </div>
 
+                  {/* BG selector */}
+                  <div className="flex justify-center gap-1.5 mb-3">
+                    {Array.from({ length: getCollectionInfo(collection)?.bgCount || 1 }, (_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setSelectedBgIndex(i)}
+                        className={`w-7 h-7 rounded-full border-2 border-[#1a1a1a] overflow-hidden transition-all ${
+                          selectedBgIndex === i ? 'ring-2 ring-[#FFCC00] scale-110' : 'opacity-70 hover:opacity-100'
+                        }`}
+                      >
+                        <img
+                          src={`/tazo-assets/frontal/${collection}/${collection}-${(i + 1).toString().padStart(2, '0')}.png`}
+                          alt={`BG ${i + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Back Preview */}
+                  <div className="flex justify-center">
+                    <div className="text-center">
+                      <p className="font-black text-[10px] uppercase tracking-wider text-zinc-500 mb-2">
+                        Back Side
+                      </p>
+                      <div className="w-16 h-16 mx-auto">
+                        <img
+                          src={`/tazo-assets/back/back-${collection}.png`}
+                          alt={`${collection} back`}
+                          className="w-full h-full rounded-full border-2 border-[#1a1a1a] object-cover"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Preview Info */}
-                  <div className="space-y-2 text-center">
+                  <div className="space-y-2 text-center mt-3">
                     <div className="flex items-center justify-center gap-2">
                       <span className="font-black text-sm uppercase tracking-wider">
                         {name || 'Unnamed'}
@@ -547,9 +599,7 @@ export default function Home() {
                       >
                         {getRarityInfo(rarity)?.name}
                       </Badge>
-                      <Badge
-                        className="font-black text-[9px] uppercase tracking-wider border-2 border-[#1a1a1a] bg-[#fffef0] text-[#1a1a1a]"
-                      >
+                      <Badge className="font-black text-[9px] uppercase tracking-wider border-2 border-[#1a1a1a] bg-[#fffef0] text-[#1a1a1a]">
                         {getRoleInfo(role)?.name}
                       </Badge>
                     </div>
@@ -583,19 +633,19 @@ export default function Home() {
                   <ul className="space-y-1.5 text-[10px] font-bold">
                     <li className="flex items-start gap-1.5">
                       <Star className="w-3 h-3 mt-0.5 text-[#FFCC00] flex-shrink-0" />
+                      The AI character is composited onto the real tazo background
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <Star className="w-3 h-3 mt-0.5 text-[#FFCC00] flex-shrink-0" />
+                      Each collection has unique frontal backgrounds
+                    </li>
+                    <li className="flex items-start gap-1.5">
+                      <Star className="w-3 h-3 mt-0.5 text-[#FFCC00] flex-shrink-0" />
                       Higher rarity = stronger base stats
                     </li>
                     <li className="flex items-start gap-1.5">
                       <Star className="w-3 h-3 mt-0.5 text-[#FFCC00] flex-shrink-0" />
                       Role determines stat distribution
-                    </li>
-                    <li className="flex items-start gap-1.5">
-                      <Star className="w-3 h-3 mt-0.5 text-[#FFCC00] flex-shrink-0" />
-                      Use Random for inspiration
-                    </li>
-                    <li className="flex items-start gap-1.5">
-                      <Star className="w-3 h-3 mt-0.5 text-[#FFCC00] flex-shrink-0" />
-                      Custom prompts give full control
                     </li>
                   </ul>
                 </div>
@@ -661,15 +711,15 @@ export default function Home() {
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {filteredArts.map(tazo => {
-                  const colInfo = getCollectionInfo(tazo.collection);
                   const rarInfo = getRarityInfo(tazo.rarity);
+                  const colInfo = getCollectionInfo(tazo.collection);
                   return (
                     <div
                       key={tazo.id}
                       className={`mag-card tazo-card-hover cursor-pointer overflow-hidden relative ${
                         tazo.rarity === 'legendary' ? 'legendary-glow' : ''
                       }`}
-                      onClick={() => setSelectedTazo(tazo)}
+                      onClick={() => { setSelectedTazo(tazo); setShowBack(false); }}
                     >
                       {tazo.isFavorite && (
                         <div className="exclusive-badge">
@@ -677,17 +727,13 @@ export default function Home() {
                         </div>
                       )}
                       {/* Image */}
-                      <div
-                        className={`aspect-square relative ${
-                          tazo.rarity === 'ultra-rare' ? 'holo-border' : ''
-                        }`}
-                      >
+                      <div className="aspect-square relative overflow-hidden">
                         <img
                           src={`data:image/png;base64,${tazo.imageData}`}
                           alt={tazo.name}
                           className="w-full h-full object-cover"
                         />
-                        {/* Collection Gradient Overlay at bottom */}
+                        {/* Collection gradient overlay */}
                         <div
                           className="absolute bottom-0 left-0 right-0 h-10 opacity-90"
                           style={{
@@ -755,24 +801,58 @@ export default function Home() {
               </DialogHeader>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-                {/* Left: Image */}
-                <div className="relative bg-[#1a1a1a] p-6 flex items-center justify-center min-h-[300px]">
-                  <div
-                    className={`relative w-56 h-56 sm:w-64 sm:h-64 rounded-full overflow-hidden border-4 shadow-[6px_6px_0px_rgba(255,204,0,0.5)] ${
-                      selectedTazo.rarity === 'legendary' ? 'border-[#FFCC00]' :
-                      selectedTazo.rarity === 'ultra-rare' ? 'border-[#A855F7]' :
-                      'border-white'
-                    } ${selectedTazo.rarity === 'ultra-rare' ? 'holo-border' : ''}`}
+                {/* Left: Image with Flip */}
+                <div className="relative bg-[#1a1a1a] p-6 flex flex-col items-center justify-center min-h-[350px]">
+                  {/* Flip Button */}
+                  <button
+                    onClick={() => setShowBack(!showBack)}
+                    className="absolute top-3 right-3 z-20 mag-btn bg-[#fffef0] text-[#1a1a1a] px-2 py-1 text-[9px] flex items-center gap-1"
                   >
-                    <img
-                      src={`data:image/png;base64,${selectedTazo.imageData}`}
-                      alt={selectedTazo.name}
-                      className="w-full h-full object-cover"
-                    />
-                    {selectedTazo.rarity === 'legendary' && (
-                      <div className="metallic-effect absolute inset-0" />
-                    )}
+                    <FlipHorizontal className="w-3 h-3" />
+                    {showBack ? 'FRONT' : 'BACK'}
+                  </button>
+
+                  {/* Card container with flip */}
+                  <div className="relative w-56 h-56 sm:w-64 sm:h-64" style={{ perspective: '800px' }}>
+                    <div
+                      className="w-full h-full transition-transform duration-500"
+                      style={{
+                        transformStyle: 'preserve-3d',
+                        transform: showBack ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                      }}
+                    >
+                      {/* Front */}
+                      <div
+                        className="absolute inset-0 rounded-full overflow-hidden border-4 shadow-[6px_6px_0px_rgba(255,204,0,0.5)]"
+                        style={{
+                          borderColor: selectedTazo.rarity === 'legendary' ? '#FFCC00' : selectedTazo.rarity === 'ultra-rare' ? '#A855F7' : '#fff',
+                          backfaceVisibility: 'hidden',
+                        }}
+                      >
+                        <img
+                          src={`data:image/png;base64,${selectedTazo.imageData}`}
+                          alt={selectedTazo.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+
+                      {/* Back */}
+                      <div
+                        className="absolute inset-0 rounded-full overflow-hidden border-4 border-white shadow-[6px_6px_0px_rgba(255,204,0,0.5)]"
+                        style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+                      >
+                        <img
+                          src={`/tazo-assets/back/back-${selectedTazo.collection}.png`}
+                          alt={`${selectedTazo.collection} back`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    </div>
                   </div>
+
+                  <p className="font-bold text-[10px] uppercase tracking-wider text-zinc-500 mt-3">
+                    Click {showBack ? 'FRONT' : 'BACK'} to flip
+                  </p>
                 </div>
 
                 {/* Right: Info */}
@@ -810,6 +890,16 @@ export default function Home() {
                   <p className="font-bold text-xs text-zinc-600 leading-relaxed">
                     {selectedTazo.description}
                   </p>
+
+                  {/* Frontal BG used */}
+                  {selectedTazo.frontalBg && (
+                    <div className="flex items-center gap-2 text-[10px]">
+                      <ImageIcon className="w-3 h-3 text-zinc-400" />
+                      <span className="font-bold text-zinc-500 uppercase tracking-wider">
+                        BG: {selectedTazo.frontalBg}
+                      </span>
+                    </div>
+                  )}
 
                   <Separator className="bg-[#1a1a1a]" />
 
@@ -867,7 +957,7 @@ export default function Home() {
                   <Separator className="bg-[#1a1a1a]" />
 
                   {/* Actions */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <button
                       onClick={() => toggleFavorite(selectedTazo)}
                       className={`mag-btn flex-1 py-2 text-xs flex items-center justify-center gap-1.5 ${
@@ -878,11 +968,18 @@ export default function Home() {
                       {selectedTazo.isFavorite ? 'Favorited' : 'Favorite'}
                     </button>
                     <button
-                      onClick={() => handleDownload(selectedTazo)}
+                      onClick={() => handleDownload(selectedTazo, 'front')}
                       className="mag-btn flex-1 py-2 text-xs bg-[#3B4CCA] text-white flex items-center justify-center gap-1.5"
                     >
                       <Download className="w-4 h-4" />
-                      Download
+                      Front
+                    </button>
+                    <button
+                      onClick={() => handleDownload(selectedTazo, 'back')}
+                      className="mag-btn py-2 px-3 text-xs bg-[#FF6B00] text-white flex items-center justify-center gap-1.5"
+                    >
+                      <Download className="w-4 h-4" />
+                      Back
                     </button>
                     <button
                       onClick={() => handleDelete(selectedTazo.id)}
