@@ -1,24 +1,20 @@
 ---
 Task ID: 1
 Agent: Main Agent
-Task: Build Tazo Art Studio - AI-powered tazo art creation application
+Task: Build Tazo Art Studio with real tazo assets and push to GitHub
 
 Work Log:
-- Researched GitHub repo (smouj/Trading-Tazos-Game) to understand tazo game mechanics, 3 collections (Minimon, Dracobell, Cybermon), 5 rarity tiers, 8 roles, 9 combat stats
-- Read THEME.md design system - 90s Nintendo Power magazine aesthetic with specific colors, typography, shadows, CSS utility classes
-- Updated Prisma schema with TazoArt model (name, collection, rarity, role, description, prompt, imageData, 9 stats, isFavorite)
-- Pushed schema to SQLite database successfully
-- Updated globals.css with complete magazine design system (mag-bg, mag-card, mag-btn, mag-stroke, legendary-glow, holo-border, metallic-effect, gradient-*, rarity-*, stat-bar, etc.)
-- Created API route /api/tazo-art (GET for listing, POST for generation with z-ai-web-dev-sdk image generation)
-- Created API route /api/tazo-art/[id] (DELETE for removal, PATCH for updates/favorites)
-- Built full frontend with create form and gallery view
-- Verified with agent-browser: form fills, random presets, generation works, gallery displays, detail modal shows stats, toast notifications work
-- Lint passes cleanly, no errors
+- Examined uploaded files: 14 frontal backgrounds (minimon:6, dracobell:4, cybermon:3, special:1) at 1254x1254, and 3 back tazos at 1024x1024
+- Extracted frontal-bg-tazos.rar and organized assets into /public/tazo-assets/
+- Updated Prisma schema with characterData and frontalBg fields
+- Updated API route to composite AI-generated character onto real frontal backgrounds using sharp
+- Updated frontend with real frontal BG previews, back tazo display, flip animation, and BG selector
+- Created GitHub repository: https://github.com/smouj/tazo-art-studio
+- Pushed complete project to GitHub
 
 Stage Summary:
-- Complete Tazo Art Studio application built and verified
-- AI image generation using z-ai-web-dev-sdk working end-to-end
-- Gallery with filter by collection/favorites
-- Detail modal with 9 combat stats, power score, favorite/download/delete
-- 90s magazine aesthetic fully implemented per THEME.md spec
-- Prisma + SQLite database for persistence
+- Complete Tazo Art Studio with real tazo asset integration
+- AI-generated characters composited onto authentic frontal backgrounds
+- Back tazo images shown with flip animation in detail modal
+- Frontal BG selector in preview panel
+- GitHub repo live at: https://github.com/smouj/tazo-art-studio
