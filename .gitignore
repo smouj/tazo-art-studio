@@ -67,3 +67,4 @@ db/
 
 # Caddy / reverse proxy config (platform-specific)
 Caddyfile
+package-lock.json
