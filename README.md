@@ -19,7 +19,7 @@ _Create. Collect. Battle._
 
 ## 📖 Overview
 
-**Tazo Art Studio** is a web application for generating, collecting, and managing AI-created tazo art cards across three iconic collections inspired by 90s pop culture. Each tazo features an AI-generated character composited onto authentic circular tazo backgrounds with full front-and-back designs.
+**Tazo Art Studio** is a web application for generating, collecting, and managing AI-created tazo art cards across TTG's three original Season 1 franchises. Each tazo features an AI-generated character composited onto circular tazo backgrounds with full front-and-back designs.
 
 > 🔗 **Related Project:** [Trading Tazos Game](https://github.com/smouj/Trading-Tazos-Game) — The original game this studio creates art for. Generate characters here, battle them there!
 
@@ -33,19 +33,19 @@ Each tazo is a **circular collectible disc** with two sides — much like the cl
 |---|---|---|
 | The AI-generated character is composited onto a real tazo frontal background | Unique back artwork per collection |
 
-### Minimon — Pokémon-Inspired Creatures ⚡
+### Minimon — Luminara Creatures
 
 <p align="center">
   <img src="public/examples/tazo-minimon-card.png" alt="Minimon Tazo Example - Front and Back" width="600">
 </p>
 
-### Dracobell — Dragon Ball Warriors 🔥
+### Dracobell — Bellora Fighters
 
 <p align="center">
   <img src="public/examples/tazo-dracobell-card.png" alt="Dracobell Tazo Example - Front and Back" width="600">
 </p>
 
-### Cybermon — Digital Monsters 💎
+### Cybermon — Neon Grid Entities
 
 <p align="center">
   <img src="public/examples/tazo-cybermon-card.png" alt="Cybermon Tazo Example - Front and Back" width="600">
@@ -98,9 +98,9 @@ Each collection has its own back-side tazo design:
 
 | Collection | Inspiration | Backgrounds | Color | Theme |
 |-----------|------------|-------------|-------|-------|
-| **Minimon** | Pokémon-style creatures | 6 frontal BGs | 🟡 Yellow/Orange | Electric mice, flame lizards, mystical creatures |
-| **Dracobell** | Dragon Ball warriors | 4 frontal BGs | 🟠 Orange/Red | Spiky-haired warriors, golden auras, epic transformations |
-| **Cybermon** | Digimon digital monsters | 3 frontal BGs | 🔵 Blue/Cyan | Digital dinosaurs, cyber-angels, chrome wolves |
+| **Minimon** | Luminara lineage creatures | 6 frontal BGs | Yellow/Orange | Vital Sparks, Pathfinders, lineage awakening |
+| **Dracobell** | Bellora aura fighters | 4 frontal BGs | Orange/Red | Roar Aura, Bell Shards, resonance phases |
+| **Cybermon** | Neon Grid entities | 3 frontal BGs | Blue/Cyan | Soul Protocols, Core Gates, Blackout Drift |
 
 ### ⭐ Five Rarity Tiers
 

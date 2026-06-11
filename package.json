@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "AI-powered Tazo Art Creator for Trading Tazos Game — Generate unique tazo art across Minimon, Dracobell & Cybermon collections with authentic 90s magazine aesthetic",
-  "keywords": ["tazo", "ai-art", "trading-cards", "nextjs", "image-generation", "pokemon", "dragon-ball", "digimon"],
+  "keywords": ["tazo", "ai-art", "trading-cards", "nextjs", "image-generation", "minimon", "dracobell", "cybermon"],
   "license": "MIT",
   "author": "smouj",
   "repository": {
