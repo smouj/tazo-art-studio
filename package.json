@@ -1,9 +1,18 @@
 {
   "name": "tazo-art-studio",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
-  "description": "AI-powered Tazo Art Creator for Trading Tazos Game — Generate unique tazo art across Minimon, Dracobell & Cybermon collections with authentic 90s magazine aesthetic",
-  "keywords": ["tazo", "ai-art", "trading-cards", "nextjs", "image-generation", "minimon", "dracobell", "cybermon"],
+  "description": "AI-powered Tazo Art Creator for Trading Tazos Game \u2014 Generate unique tazo art across Minimon, Dracobell & Cybermon collections with authentic 90s magazine aesthetic",
+  "keywords": [
+    "tazo",
+    "ai-art",
+    "trading-cards",
+    "nextjs",
+    "image-generation",
+    "minimon",
+    "dracobell",
+    "cybermon"
+  ],
   "license": "MIT",
   "author": "smouj",
   "repository": {
