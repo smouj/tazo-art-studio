@@ -10,7 +10,7 @@ _Create. Collect. Battle._
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss)](https://tailwindcss.com/)
 [![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma)](https://www.prisma.io/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![License: proprietary](https://img.shields.io/badge/License-proprietary-green.svg)](./LICENSING)
 [![GitHub Pages](https://img.shields.io/badge/Demo-GitHub_Pages-222?logo=github)](https://smouj.github.io/tazo-art-studio/)
 
 </div>
@@ -258,7 +258,7 @@ tazo-art-studio/
 │   └── generate-examples.mjs       # README example image generator
 ├── .env.example                    # Environment variable template
 ├── .gitignore
-├── LICENSE                         # MIT License
+├── LICENSING                         # proprietary License
 ├── package.json
 └── tsconfig.json
 ```
@@ -368,7 +368,7 @@ Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for g
 
 ## 📄 License
 
-This project is licensed under the MIT License — see the [LICENSE](./LICENSE) file for details.
+This project is licensed under the proprietary License — see the [LICENSING](./LICENSING) file for details.
 
 ---
 
