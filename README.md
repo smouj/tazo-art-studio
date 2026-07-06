@@ -33,19 +33,19 @@ Each tazo is a **circular collectible disc** with two sides — much like the cl
 |---|---|---|
 | The AI-generated character is composited onto a real tazo frontal background | Unique back artwork per collection |
 
-### Minimon — Luminara Creatures
+### Minimon — Elemental Creatures
 
 <p align="center">
   <img src="public/examples/tazo-minimon-card.png" alt="Minimon Tazo Example - Front and Back" width="600">
 </p>
 
-### Dracobell — Bellora Fighters
+### Dracobell — Mystic Fighters
 
 <p align="center">
   <img src="public/examples/tazo-dracobell-card.png" alt="Dracobell Tazo Example - Front and Back" width="600">
 </p>
 
-### Cybermon — Neon Grid Entities
+### Cybermon — Digital Entities
 
 <p align="center">
   <img src="public/examples/tazo-cybermon-card.png" alt="Cybermon Tazo Example - Front and Back" width="600">
@@ -57,19 +57,19 @@ Each tazo is a **circular collectible disc** with two sides — much like the cl
 
 Each collection features unique circular backgrounds where AI characters are composited onto. The backgrounds are actual PNG assets giving each tazo its authentic 90s aesthetic.
 
-### Minimon — 6 Unique Backgrounds
+### Minimon — 18 Elemental Backgrounds
 
 <p align="center">
   <img src="public/examples/tazo-minimon-showcase.png" alt="Minimon frontal backgrounds" width="700">
 </p>
 
-### Dracobell — 4 Unique Backgrounds
+### Dracobell — 10 Mystic Aura Backgrounds
 
 <p align="center">
   <img src="public/examples/tazo-dracobell-showcase.png" alt="Dracobell frontal backgrounds" width="700">
 </p>
 
-### Cybermon — 3 Unique Backgrounds
+### Cybermon — 9 Digital Realm Backgrounds
 
 <p align="center">
   <img src="public/examples/tazo-cybermon-showcase.png" alt="Cybermon frontal backgrounds" width="700">
@@ -98,9 +98,9 @@ Each collection has its own back-side tazo design:
 
 | Collection | Inspiration | Backgrounds | Color | Theme |
 |-----------|------------|-------------|-------|-------|
-| **Minimon** | Luminara lineage creatures | 6 frontal BGs | Yellow/Orange | Vital Sparks, Pathfinders, lineage awakening |
-| **Dracobell** | Bellora aura fighters | 4 frontal BGs | Orange/Red | Roar Aura, Bell Shards, resonance phases |
-| **Cybermon** | Neon Grid entities | 3 frontal BGs | Blue/Cyan | Soul Protocols, Core Gates, Blackout Drift |
+| **Minimon** | Elemental lineage creatures | 18 frontal BGs | Yellow/Orange | 18 types: Acero, Agua, Bicho, Dragón, Eléctrico, Fantasma, Fuego, Hada, Hielo, Lucha, Normal, Planta, Psíquico, Roca, Siniestro, Tierra, Veneno, Volador |
+| **Dracobell** | Bellora mystic fighters | 10 frontal BGs | Orange/Red | 10 auras: Campana, Draco, Fuego, Impacto, Luz, Místico, Naturaleza, Oscuro, Rayo, Tecno |
+| **Cybermon** | Neon Grid digital entities | 9 frontal BGs | Blue/Cyan | 9 realms: Base, Burst, Corrupto, Link, Lugar, Nexus, Objeto, Personaje, Villano |
 
 ### ⭐ Five Rarity Tiers
 
@@ -225,9 +225,9 @@ tazo-art-studio/
 ├── public/
 │   ├── tazo-assets/                # Real tazo background artwork
 │   │   ├── frontal/                # Frontal backgrounds per collection
-│   │   │   ├── minimon/            # 6 PNG backgrounds (1254×1254)
-│   │   │   ├── dracobell/          # 4 PNG backgrounds (1254×1254)
-│   │   │   ├── cybermon/           # 3 PNG backgrounds (1254×1254)
+│   │   │   ├── minimon/            # 18 PNG backgrounds (1254×1254)
+│   │   │   ├── dracobell/          # 10 PNG backgrounds (1254×1254)
+│   │   │   ├── cybermon/           # 9 PNG backgrounds (1254×1254)
 │   │   │   └── special/            # Cross-collection legendary BG
 │   │   └── back/                   # Back designs per collection
 │   │       ├── back-minimon.png
@@ -349,10 +349,10 @@ The application follows a **90s Nintendo Power / Pokémon Magazine** aesthetic:
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+This is a community project — contributions and feedback are appreciated! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+1. Open an Issue to discuss your idea first
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request

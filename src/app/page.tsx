@@ -50,9 +50,33 @@ interface TazoArt {
 
 // Constants
 const COLLECTIONS = [
-  { id: 'minimon', name: 'Minimon', gradient: 'gradient-minimon', color: '#FFCB05', desc: 'Pokemon-inspired creatures', bgCount: 6 },
-  { id: 'dracobell', name: 'Dracobell', gradient: 'gradient-dracobell', color: '#FF6B00', desc: 'Dragon Ball warriors', bgCount: 4 },
-  { id: 'cybermon', name: 'Cybermon', gradient: 'gradient-cybermon', color: '#00A1E9', desc: 'Digital monsters', bgCount: 3 },
+  {
+    id: 'minimon',
+    name: 'Minimon',
+    gradient: 'gradient-minimon',
+    color: '#FFCB05',
+    desc: '18 elemental creature backgrounds',
+    bgCount: 18,
+    bgNames: ['acero', 'agua', 'bicho', 'dragon', 'electrico', 'fantasma', 'fuego', 'hada', 'hielo', 'lucha', 'normal', 'planta', 'psiquico', 'roca', 'siniestro', 'tierra', 'veneno', 'volador'],
+  },
+  {
+    id: 'dracobell',
+    name: 'Dracobell',
+    gradient: 'gradient-dracobell',
+    color: '#FF6B00',
+    desc: '10 mystic warrior backgrounds',
+    bgCount: 10,
+    bgNames: ['campana', 'draco', 'fuego', 'impacto', 'luz', 'mistico', 'naturaleza', 'oscuro', 'rayo', 'tecno'],
+  },
+  {
+    id: 'cybermon',
+    name: 'Cybermon',
+    gradient: 'gradient-cybermon',
+    color: '#00A1E9',
+    desc: '9 digital realm backgrounds',
+    bgCount: 9,
+    bgNames: ['base', 'burst', 'corrupto', 'link', 'lugar', 'nexus', 'objeto', 'personaje', 'villano'],
+  },
 ];
 
 const RARITIES = [
@@ -319,8 +343,9 @@ export default function Home() {
   const getFrontalBgPreview = () => {
     const colInfo = getCollectionInfo(collection);
     if (!colInfo) return '';
-    const idx = (selectedBgIndex % colInfo.bgCount) + 1;
-    return `/tazo-assets/frontal/${collection}/${collection}-${idx.toString().padStart(2, '0')}.png`;
+    const idx = selectedBgIndex % colInfo.bgCount;
+    const bgName = colInfo.bgNames ? colInfo.bgNames[idx] : String(idx + 1).padStart(2, '0');
+    return `/tazo-assets/frontal/${collection}/${collection}-${bgName}.png`;
   };
 
   return (
@@ -586,8 +611,8 @@ export default function Home() {
                         }`}
                       >
                         <img
-                          src={`/tazo-assets/frontal/${collection}/${collection}-${(i + 1).toString().padStart(2, '0')}.png`}
-                          alt={`BG ${i + 1}`}
+                          src={`/tazo-assets/frontal/${collection}/${collection}-${(() => { const ci = getCollectionInfo(collection); return ci?.bgNames ? ci.bgNames[i] : String(i + 1).padStart(2, '0'); })()}.png`}
+                          alt={`${collection} ${(() => { const ci = getCollectionInfo(collection); return ci?.bgNames?.[i]; })() || `BG ${i + 1}`}`}
                           className="w-full h-full object-cover"
                         />
                       </button>
