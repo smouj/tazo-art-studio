@@ -85,6 +85,10 @@ Mandatory output requirements:
 const NEGATIVE_PROMPT =
   'background, scenery, landscape, room, sky, stars background, galaxy background, gradient background, white background, black background, circular frame, coin frame, card border, text, letters, watermark, logo, UI, stats, number, nameplate, dirty cutout, square image background, environmental background, scene, platform, floor, ground, pedestal';
 
+function appendGenerationGuards(prompt: string): string {
+  return `${prompt}\n\n${TRANSPARENCY_GUARD}\nAvoid completely: ${NEGATIVE_PROMPT}.`;
+}
+
 /** Build the final prompt with transparency guard always applied */
 function buildFinalPrompt(
   name: string,
@@ -100,15 +104,14 @@ function buildFinalPrompt(
 
   if (customPrompt && customPrompt.trim().length > 0) {
     // Even with custom prompts, always append the transparency guard
-    return `${customPrompt.trim()}\n\n${TRANSPARENCY_GUARD}`;
+    return appendGenerationGuards(customPrompt.trim());
   }
 
-  return `Transparent PNG character illustration for a collectible tazo disc: ${name}, ${description}.
+  return appendGenerationGuards(`Transparent PNG character illustration for a collectible tazo disc: ${name}, ${description}.
 ${baseStyle}. ${rarityStyle}. ${roleStyle}.
 Full body character only, centered composition, real alpha transparent background.
 Clean silhouette, bold 90s anime outlines, cel shading, soft transparent contact shadow.
-Designed to be composited over a separate tazo frontal background.
-${TRANSPARENCY_GUARD}`;
+Designed to be composited over a separate tazo frontal background.`);
 }
 
 // ──────────────────────────────────────────────
@@ -207,7 +210,6 @@ export async function POST(request: NextRequest) {
 
     const response = await zai.images.generations.create({
       prompt: prompt,
-      negative_prompt: NEGATIVE_PROMPT,
       size: '1024x1024',
     });
 
